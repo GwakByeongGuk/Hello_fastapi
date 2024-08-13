@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from sqlalchemy import create_engine, Column, String, Integer
@@ -56,7 +56,7 @@ def read_sj(db: Session = Depends(get_db)):
     sungjuks = db.query(Sungjuk).all()
     return sungjuks
 
-# 성적 조회
+# 성적 추가
 @app.post('/sj', response_model=SungjukModel)
 def sjadd(sj: SungjukModel, db: Session = Depends(get_db)):
     sj = Sungjuk(**dict(sj)) # 클라이언트가 전송한 성적데이터가
@@ -70,6 +70,12 @@ def sjadd(sj: SungjukModel, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(sj)
     return sj
+
+# 성적 상세 조회 - 학생번호로 조회
+@app.get('/sj/{sjng}', response_model=Optional[SungjukModel])
+def read_sjone(sjng: int, db: Session = Depends(get_db)):
+    sungjuk = db.query(Sungjuk).filter(Sungjuk.sjng == sjng).first()
+    return sungjuk
 
 if __name__ == "__main__":
     import uvicorn
