@@ -73,8 +73,18 @@ def sjadd(sj: SungjukModel, db: Session = Depends(get_db)):
 
 # 성적 상세 조회 - 학생번호로 조회
 @app.get('/sj/{sjng}', response_model=Optional[SungjukModel])
-def read_sjone(sjng: int, db: Session = Depends(get_db)):
+def readone_sj(sjng: int, db: Session = Depends(get_db)):
     sungjuk = db.query(Sungjuk).filter(Sungjuk.sjng == sjng).first()
+    return sungjuk
+
+# 성적 삭제 - 학생번호로 조회
+# 먼저, 삭제할 학생 데이터가 있는지 확인한 후 삭제 실행
+@app.delete('/sj/{sjng}', response_model=Optional[SungjukModel])
+def delete_sj(sjng: int, db: Session = Depends(get_db)):
+    sungjuk = db.query(Sungjuk).filter(Sungjuk.sjng == sjng).first()
+    if sungjuk:
+        db.delete(sungjuk)
+        db.commit()
     return sungjuk
 
 if __name__ == "__main__":
